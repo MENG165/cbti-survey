@@ -1368,7 +1368,10 @@ function submitQuiz() {
 
 
 
-  const dims = [];
+  // 计算五维向量并发送
+  var fiveKeys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  var user5d = (typeof HANDBOOK_FIVE_D !== 'undefined' && HANDBOOK_FIVE_D) ? computeUser5D(state.answers) : null;
+  const dims = user5d ? fiveKeys.map(function(dk) { return parseFloat((user5d[dk] || 0).toFixed(3)); }) : [];
   const submitId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('s' + Date.now() + '-' + Math.random().toString(36).slice(2, 11));
   const payload = {
     name: state.userInfo?.name || '',

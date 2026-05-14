@@ -511,7 +511,10 @@ def clear_all_records() -> int:
         n = conn.scalar(select(func.count()).select_from(records_tbl)) or 0
         if IS_SQLITE:
             conn.execute(delete(records_tbl))
-            conn.execute(text("DELETE FROM sqlite_sequence WHERE name='records'"))
+            try:
+                conn.execute(text("DELETE FROM sqlite_sequence WHERE name='records'"))
+            except Exception:
+                pass  # sqlite_sequence 表可能不存在（无自增记录时）
         else:
             conn.execute(text("TRUNCATE TABLE records RESTART IDENTITY"))
         return int(n)

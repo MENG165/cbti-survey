@@ -3,6 +3,7 @@
 import csv
 import io
 import json
+import re
 import os
 
 import qrcode
@@ -58,6 +59,21 @@ def _admin_password_ok(pwd: str) -> bool:
     if LEGACY_ADMIN_PASSWORD and pwd == LEGACY_ADMIN_PASSWORD:
         return True
     return False
+
+
+def _normalize_answers_keys(answers):
+    """统一 answers 的键名为大写 Q 格式（兼容前端 Q1 与压测 q1）。"""
+    if not isinstance(answers, dict):
+        return answers
+    normalized = {}
+    for k, v in answers.items():
+        m = re.match(r'[qQ](\d+)$', str(k))
+        if m:
+            normalized[f"Q{m.group(1)}"] = v
+        else:
+            normalized[k] = v
+    return normalized
+
 
 
 def admin_required(f):
@@ -170,7 +186,7 @@ def submit():
             "result": data.get("result", ""),
             "haming": data.get("haming", 0),
             "dims": data.get("dims", []),
-            "answers": data.get("answers", {}),
+            "answers": _normalize_answers_keys(data.get("answers", {})),
             "time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S"),
         },
         client_submit_id=submit_id,
