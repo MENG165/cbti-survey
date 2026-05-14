@@ -396,3 +396,29 @@ database.migrate_db()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7860, debug=True)
+
+@app.route("/api/migrate")
+@admin_required
+def api_migrate():
+    """执行数据库迁移（添加索引等），用于线上快速修复。"""
+    try:
+        database.init_db()
+        return jsonify({"ok": True, "message": "数据库迁移完成（索引已创建）"})
+    except Exception as e:
+        return jsonify({"ok": False, "message": f"迁移失败: {e}"}), 500
+
+@app.route("/api/db-stats")
+@admin_required
+def api_db_stats():
+    """轻量级数据库状态检查。"""
+    try:
+        total = database.count_records()
+        return jsonify({"ok": True, "total": total})
+    except Exception as e:
+        return jsonify({"ok": False, "message": str(e)}), 500
+
+@app.after_request
+def add_cors_headers(resp):
+    resp.headers["X-Robots-Tag"] = "noindex"
+    return resp
+

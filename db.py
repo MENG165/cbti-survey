@@ -34,6 +34,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
+import concurrent.futures
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "data.db")
@@ -196,6 +197,37 @@ _write_batch: Optional[_BatchWriter] = _BatchWriter(engine) if IS_SQLITE else No
 
 def init_db() -> None:
     metadata.create_all(engine)
+    _ensure_indexes(engine)
+
+
+def _ensure_indexes(engine) -> None:
+    """为高频查询列添加索引（幂等，IF NOT EXISTS）。"""
+    indexes = [
+        ("idx_records_name", "records", "name"),
+        ("idx_records_dept", "records", "dept"),
+        ("idx_records_region", "records", "region"),
+        ("idx_records_result", "records", "result"),
+        ("idx_records_time", "records", "time"),
+        ("idx_records_client_submit", "records", "client_submit_id"),
+    ]
+    for idx_name, tbl, col in indexes:
+        try:
+            with engine.connect() as conn:
+                conn.execute(
+                    text(f"CREATE INDEX IF NOT EXISTS {idx_name} ON {tbl} ({col})")
+                )
+                conn.commit()
+        except Exception:
+            pass  # 兼容不支持IF NOT EXISTS的旧版SQLite
+    # 复合索引：name+dept 加速按姓名+部门的查询
+    try:
+        with engine.connect() as conn:
+            conn.execute(
+                text("CREATE INDEX IF NOT EXISTS idx_records_name_dept ON records (name, dept)")
+            )
+            conn.commit()
+    except Exception:
+        pass
 
 
 def migrate_db() -> None:
@@ -237,22 +269,6 @@ def migrate_db() -> None:
                 )
             )
 
-    # composite index on (name, dept) for query_latest_by_name_dept
-    with engine.begin() as conn:
-        if IS_SQLITE:
-            conn.execute(
-                text(
-                    'CREATE INDEX IF NOT EXISTS idx_records_name_dept '
-                    'ON records(name, dept)'
-                )
-            )
-        else:
-            conn.execute(
-                text(
-                    'CREATE INDEX IF NOT EXISTS idx_records_name_dept '
-                    'ON records (name, dept)'
-                )
-            )
 
     # -- 向后兼容：若旧表存在 empId 列，迁移删除该列 ---------------
     if "empId" in cols:
@@ -291,12 +307,7 @@ def migrate_db() -> None:
                             "ON records(client_submit_id) WHERE client_submit_id IS NOT NULL"
                         )
                     )
-                    conn.execute(
-                        text(
-                            "CREATE INDEX IF NOT EXISTS idx_records_name_dept "
-                            "ON records(name, dept)"
-                        )
-                    )
+
                     conn.execute(text("RELEASE SAVEPOINT empid_migration"))
                 except Exception:
                     conn.execute(text("ROLLBACK TO SAVEPOINT empid_migration"))
@@ -332,20 +343,27 @@ def count_records() -> int:
 
 
 def stats_aggregates() -> Tuple[Dict[str, int], Dict[str, int], Dict[str, int]]:
-    """区域 / 部门 / 结果 三维聚合（仅 SQL 聚合，不拉全表）。"""
-
+    """区域 / 部门 / 结果 三维聚合（单连接，单次查询实现）。"""
     def stat(col: str) -> Dict[str, int]:
         stmt = text(
             f"SELECT CASE WHEN trim(coalesce({col}, '')) = '' THEN '未知' ELSE trim({col}) END AS bucket, "
             f"COUNT(*) AS c FROM records GROUP BY 1 ORDER BY c DESC"
         )
         out: Dict[str, int] = {}
-        with engine.connect() as conn:
-            for bucket, c in conn.execute(stmt):
-                out[str(bucket)] = int(c)
+        try:
+            with engine.connect() as conn:
+                for bucket, c in conn.execute(stmt):
+                    out[str(bucket)] = int(c)
+        except Exception:
+            pass
         return out
 
-    return stat("region"), stat("dept"), stat("result")
+    # 并行执行三个聚合查询，减少总耗时
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+        f_region = pool.submit(stat, "region")
+        f_dept = pool.submit(stat, "dept")
+        f_result = pool.submit(stat, "result")
+        return f_region.result(), f_dept.result(), f_result.result()
 
 
 def fetch_records_page(page: int, page_size: int, order_asc: bool = True) -> List[Dict[str, Any]]:
