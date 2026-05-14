@@ -1,0 +1,6 @@
+flask>=3.0
+gunicorn>=22.0
+flask-compress>=1.14
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+qrcode[pil]>=7.4

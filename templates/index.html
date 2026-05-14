@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CBTI 职场人格鉴定所</title>
+<style>
+  /* Font stack: system fonts for fast loading */
+  
+  :root {
+    --bg: #f8f5f0;
+    --card: #ffffff;
+    --primary: #e8513a;
+    --primary-light: #fce8e4;
+    --secondary: #2b2b2b;
+    --accent: #ffb347;
+    --text: #2b2b2b;
+    --text-light: #8a8a8a;
+    --border: #e8e0d8;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.06);
+    --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* ===== START SCREEN ===== */
+  #start-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 24px;
+    text-align: center;
+    background: linear-gradient(160deg, #2b2b2b 0%, #1a1a2e 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  #start-screen::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: -20%;
+    width: 140%; height: 140%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(232,81,58,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(255,179,71,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .start-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 32px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .start-title {
+    font-size: clamp(36px, 8vw, 56px);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .start-title span { color: var(--accent); }
+  .start-sub {
+    font-size: clamp(16px, 3vw, 20px);
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+  .start-quote {
+    font-size: 15px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    margin-bottom: 48px;
+  }
+  .start-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 380px;
+    width: 100%;
+    margin-bottom: 40px;
+  }
+  .start-info-item {
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .start-info-item .num {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    display: block;
+  }
+  .start-info-item .label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #1a1a2e;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    z-index: 1;
+  }
+  .btn-primary:hover { transform: scale(1.04); box-shadow: 0 8px 32px rgba(255,179,71,0.3); }
+  .btn-primary:active { transform: scale(0.97); }
+  
+  /* ===== QUIZ SCREEN ===== */
+  #quiz-screen {
+    display: none;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px 16px 100px;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .quiz-header .brand {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--secondary);
+  }
+  .quiz-header .brand small {
+    font-weight: 400;
+    color: var(--text-light);
+  }
+  .quiz-progress-text {
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  
+  .question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    box-shadow: var(--shadow);
+    animation: fadeSlideUp 0.4s ease;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .q-number {
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+  .q-title {
+    font-size: clamp(17px, 4vw, 20px);
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    color: var(--secondary);
+  }
+  
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--bg);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+    width: 100%;
+  }
+  .option-btn:hover { border-color: var(--accent); background: #fffbf0; }
+  .option-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .option-btn .opt-key {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-light);
+    transition: var(--transition);
+  }
+  .option-btn.selected .opt-key {
+    background: var(--primary);
+    color: #fff;
+  }
+  
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 12px;
+  }
+  .btn-nav {
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  .btn-nav.prev {
+    background: transparent;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+  }
+  .btn-nav.prev:hover { border-color: var(--text-light); }
+  .btn-nav.next {
+    background: var(--secondary);
+    color: #fff;
+    flex: 1;
+  }
+  .btn-nav.next:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .btn-nav.next:not(:disabled):hover { background: #000; }
+  
+  /* ===== RESULT SCREEN ===== */
+  #result-screen {
+    display: none;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    min-height: 100vh;
+    animation: fadeSlideUp 0.5s ease;
+  }
+  
+  .result-header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .result-header .emoji-big {
+    font-size: 64px;
+    margin-bottom: 12px;
+  }
+  .result-header .result-label {
+    font-size: 14px;
+    color: var(--text-light);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .result-header .result-name {
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 900;
+  }
+  .result-header .result-tagline {
+    font-size: 18px;
+    color: var(--primary);
+    font-weight: 500;
+    margin-top: 8px;
+  }
+  
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .result-card .desc {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .result-card .desc p { margin-bottom: 12px; }
+  .result-card .comfort {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--primary-light);
+    border-radius: 12px;
+    border-left: 3px solid var(--primary);
+  }
+  .result-card .comfort strong {
+    color: var(--primary);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  .result-card .comfort p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  
+  .dims-chart {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+  }
+  @media (max-width: 720px) {
+    .dims-chart {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 420px) {
+    .dims-chart {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .dim-item {
+    text-align: center;
+    padding: 12px 6px;
+    background: var(--bg);
+    border-radius: 12px;
+  }
+  .dim-item .dim-name {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 6px;
+    font-weight: 500;
+    line-height: 1.25;
+    min-height: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dim-item .dim-value {
+    font-size: 26px;
+    font-weight: 900;
+  }
+  .dim-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .dim-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+  
+  .match-info {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+  
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .result-actions button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  .btn-restart {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border) !important;
+  }
+  .btn-restart:hover { background: var(--border); }
+  .btn-share {
+    background: var(--secondary);
+    color: #fff;
+  }
+  .btn-share:hover { background: #000; }
+  
+  /* ===== ALL RESULTS MODAL ===== */
+  #all-results-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    
+    z-index: 100;
+    overflow-y: auto;
+    padding: 20px;
+    will-change: transform;
+  }
+  #all-results-modal.active { display: flex; align-items: flex-start; justify-content: center; }
+  .modal-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    max-width: 640px;
+    width: 100%;
+    padding: 32px 24px;
+    margin-top: 20px;
+    animation: fadeSlideUp 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-content h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .modal-close {
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px 32px;
+    border-radius: 50px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  
+  .personality-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .radar-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .radar-svg { width: 180px; height: 180px; }
+  
+  /* ===== PERSONALITY DETAIL MODAL ===== */
+  #personality-detail-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    
+    z-index: 1000;
+    padding: 20px;
+    overflow-y: auto;
+    will-change: transform;
+  }
+  #personality-detail-modal.active { display: flex; align-items: center; justify-content: center; }
+  .detail-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    max-width: 600px;
+    width: 100%;
+    padding: 36px 28px 28px;
+    animation: fadeSlideUp 0.3s ease;
+    max-height: 90vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .detail-header img {
+    width: 120px; height: 120px;
+    border-radius: 0;
+    object-fit: cover;
+    border: 4px solid var(--primary-light);
+    flex-shrink: 0;
+  }
+  .detail-header .detail-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .detail-header .detail-tagline {
+    font-size: 14px;
+    color: var(--primary);
+  }
+  .detail-body {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.8;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .detail-body::-webkit-scrollbar { width: 4px; }
+  .detail-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+  .detail-body p { margin-bottom: 10px; }
+  .detail-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    background: none;
+    border: none;
+    font-family: inherit;
+    line-height: 1;
+  }
+  .detail-close:hover { color: #333; }
+  .view-detail-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .view-detail-btn:hover { background: var(--primary); color: #fff; }
+
+  /* ===== QR Code ===== */
+  .qr-section {
+    text-align: center;
+    padding: 20px;
+    margin-top: 12px;
+  }
+  .qr-section img {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .qr-section p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    .question-card { padding: 24px 16px; }
+    .option-btn { padding: 14px 14px; font-size: 14px; }
+    .result-card { padding: 20px 16px; }
+    .dims-chart { gap: 8px; }
+  }
+
+/* ---- Start Form ---- */
+.start-form {
+  width: 100%;
+  max-width: 360px;
+  margin: 20px auto;
+  text-align: left;
+}
+.form-group {
+  margin-bottom: 14px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+.form-group .required {
+  color: #ff6b6b;
+}
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.form-group input:focus {
+  border-color: var(--primary);
+  background: rgba(255,255,255,0.12);
+}
+.form-group input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+.form-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 8px;
+  min-height: 20px;
+}
+
+
+/* ---- Result Personality Image ---- */
+.result-img-wrapper {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 8px;
+  border-radius: 0;
+  overflow: hidden;
+  background: #f5f0eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.result-person-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+  /* ===== QR SHARE ===== */
+  .qr-share-section {
+    margin: 24px 0 12px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .qr-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+  }
+  .qr-divider::before,
+  .qr-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  .qr-code-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .qr-code-box #qrcode {
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-code-box #qrcode img {
+    width: 160px;
+    height: 160px;
+    border-radius: 8px;
+  }
+  .qr-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #999;
+  }
+
+</style>
+
+  <!-- 预加载提示 -->
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .app-loading { 
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; animation: fadeIn 0.5s ease;
+      background: #f8f5f0;
+    }
+    .app-loading .logo-text {
+      font-size: 22px; font-weight: 900; color: #2b2b2b; margin-bottom: 40px;
+      letter-spacing: 2px;
+    }
+    .app-loading .logo-text span { color: #e8513a; }
+    .app-loading .spinner {
+      width: 40px; height: 40px; border: 3px solid #e8e0d8;
+      border-top-color: #e8513a; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      will-change: transform;
+    }
+    .app-loading p { margin-top: 20px; color: #8a8a8a; font-size: 15px; animation: pulse 2s ease-in-out infinite; }
+    .app-loading .loading-bar {
+      width: 160px; height: 3px; background: #e8e0d8; border-radius: 3px;
+      margin-top: 24px; overflow: hidden;
+    }
+    .app-loading .loading-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #e8513a, #ffb347);
+      border-radius: 3px;
+      animation: loadingProgress 1.5s ease-in-out forwards;
+    }
+    @keyframes loadingProgress {
+      0% { width: 0%; }
+      30% { width: 30%; }
+      60% { width: 55%; }
+      85% { width: 78%; }
+      100% { width: 90%; }
+    }
+    #app-content { display: none; }
+    #app-content.ready { display: block; }
+  </style>
+</head>
+<body>
+<div id="app-loading" class="app-loading">
+  <div class="logo-text">CBTI <span>职场人格鉴定所</span></div>
+  <div class="spinner"></div>
+  <p>正在加载测评...</p>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+<div id="app-content">
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen">
+  <div class="start-badge">🔮 2026 职场人格鉴定</div>
+  <h1 class="start-title">CBTI<br><span>职场人格鉴定所</span></h1>
+  <p class="start-sub">测完别哭，同事和你一样离谱</p>
+  <p class="start-quote">「你是什么职场人格？来看看就知道了。看完你会发现：原来我这么酷！」</p>
+  <p style="font-size:13px; color:rgba(255,255,255,0.45); margin-bottom:24px;">此测评仅对Office产研事业部内部开放</p>
+  <p style="font-size:13px; color:#d4726a; font-weight:bold; margin-bottom:24px;">如未填写真实信息则顺延中奖</p>
+  <div class="start-info">
+    <div class="start-info-item">
+      <span class="num">21</span>
+      <span class="label">道题</span>
+    </div>
+    <div class="start-info-item">
+      <span class="num">10</span>
+      <span class="label">种人格</span>
+    </div>
+    <div class="start-info-item">
+      <span class="num">3分钟</span>
+      <span class="label">就能测完</span>
+    </div>
+  </div>
+
+  <!-- ===== QR CODE SECTION ===== -->
+  <div class="qr-share-section" id="qr-share-section" style="display:none;">
+    <div class="qr-divider"><span>或扫码分享给同事</span></div>
+    <div class="qr-code-box">
+      <div id="qrcode"></div>
+      <p class="qr-hint">扫码打开问卷，看看Ta是什么人格</p>
+    </div>
+  </div>
+
+  <div class="start-form">
+    <div class="form-group">
+      <label>姓名 <span class="required">*</span></label>
+      <input type="text" id="field-name" placeholder="请务必填写真实姓名，否则不予中奖" required>
+    </div>
+    <div class="form-group">
+      <label>二级部门 <span class="required">*</span></label>
+      <select id="field-dept" required style="width:100%; padding:14px 16px; border:2px solid var(--border); border-radius:12px; font-size:15px; background:var(--card); color:var(--text); font-family:inherit; appearance:auto;">
+        <option value="">请选择二级部门</option>
+        <option value="基础框架部">基础框架部</option>
+        <option value="文档产研部">文档产研部</option>
+        <option value="Office服务研发部">Office服务研发部</option>
+        <option value="PC多平台产研部">PC多平台产研部</option>
+        <option value="移动产研部">移动产研部</option>
+        <option value="表格产研部">表格产研部</option>
+        <option value="演示产研部">演示产研部</option>
+        <option value="Office云文档产研部">Office云文档产研部</option>
+        <option value="质量保障部">质量保障部</option>
+        <option value="版式产研部">版式产研部</option>
+        <option value="AI创新部">AI创新部</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>实际工作地 <span class="required">*</span></label>
+      <select id="field-region" required style="width:100%; padding:14px 16px; border:2px solid var(--border); border-radius:12px; font-size:15px; background:var(--card); color:var(--text); font-family:inherit; appearance:auto;">
+        <option value="">请选择区域</option>
+        <option value="珠海">珠海</option>
+        <option value="武汉">武汉</option>
+        <option value="北京">北京</option>
+        <option value="广州">广州</option>
+      </select>
+    </div>
+
+    <div class="form-error" id="form-error"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:12px; z-index:1;">
+  <button class="btn-primary" onclick="startQuiz()">开始鉴定 →</button>
+  <button class="btn-secondary" onclick="showQueryModal()" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.12); padding:12px 32px; border-radius:50px; font-size:15px; font-weight:500; cursor:pointer; transition:0.3s;">查看我的上次结果</button>
+</div>
+</div>
+
+<!-- ===== QUIZ SCREEN ===== -->
+<div id="quiz-screen">
+  <div id="submit-overlay" style="display:none; position:fixed; inset:0; background:rgba(248,245,240,0.92); z-index:200; align-items:center; justify-content:center; flex-direction:column; gap:12px;">
+    <div style="font-size:17px; font-weight:700; color:var(--secondary);">正在保存测评结果…</div>
+    <div style="font-size:13px; color:var(--text-light);">请稍候，勿关闭页面</div>
+  </div>
+  <div class="quiz-header">
+    <div class="brand">CBTI <small>· 职场人格</small></div>
+    <div class="quiz-progress-text" id="progress-text">1 / 21</div>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <div id="question-container"></div>
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div id="result-screen">
+  <div class="result-header">
+    <div class="emoji-big" id="result-emoji" style="display:none">🧑‍🔧</div>
+    <div class="result-img-wrapper" id="result-img-wrapper"><img id="result-img" src="" alt="人格形象" class="result-person-img" loading="lazy"></div>
+    <div class="result-label">你的职场人格是</div>
+    <h2 class="result-name" id="result-name">锅の传人</h2>
+    <div class="result-tagline" id="result-tagline">"有事真上，有锅真接"</div>
+  </div>
+  
+  <div class="result-card">
+    <div class="desc" id="result-desc"></div>
+  </div>
+  
+  <div class="result-card">
+    <h3 style="font-size:16px; margin-bottom:8px;">📊 你的五维画像（手册测评维度）</h3>
+    <p style="font-size:12px; color:var(--text-light); line-height:1.5; margin-bottom:12px;">按 V4 手册各题五维权重，将本次作答归一化到 0～5 分，仅表示相对强弱，不单独决定人格类型。</p>
+    <div class="dims-chart">
+      <div class="dim-item">
+        <div class="dim-name">推动力</div>
+        <div class="dim-value" id="five-d-val-drive">0</div>
+        <div class="dim-bar"><div class="dim-bar-fill" id="five-d-bar-drive" style="width:0%"></div></div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-name">关系力</div>
+        <div class="dim-value" id="five-d-val-relate">0</div>
+        <div class="dim-bar"><div class="dim-bar-fill" id="five-d-bar-relate" style="width:0%"></div></div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-name">规则与闭环</div>
+        <div class="dim-value" id="five-d-val-structure">0</div>
+        <div class="dim-bar"><div class="dim-bar-fill" id="five-d-bar-structure" style="width:0%"></div></div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-name">边界与自我</div>
+        <div class="dim-value" id="five-d-val-boundary">0</div>
+        <div class="dim-bar"><div class="dim-bar-fill" id="five-d-bar-boundary" style="width:0%"></div></div>
+      </div>
+      <div class="dim-item">
+        <div class="dim-name">节奏与恢复</div>
+        <div class="dim-value" id="five-d-val-pace">0</div>
+        <div class="dim-bar"><div class="dim-bar-fill" id="five-d-bar-pace" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="match-info" id="match-info"></div>
+  
+  <div class="result-card">
+    <div class="qr-section" id="qr-section">
+      <div id="qr-code"></div>
+      <p>📱 扫码分享给同事，看看Ta是什么人格</p>
+    </div>
+  </div>
+  
+  <div class="result-actions">
+    <button class="btn-restart" onclick="restartQuiz()">重新测试</button>
+    <button class="btn-share" onclick="showAllResults()">查看全部10种人格</button>
+  </div>
+</div>
+
+
+<!-- ===== QUERY MODAL ===== -->
+<div id="query-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999; will-change:transform; align-items:center; justify-content:center;">
+  <div style="background:var(--card); border-radius:var(--radius); padding:32px 24px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative;">
+    <button onclick="closeQueryModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:24px; color:var(--text-light); cursor:pointer;">×</button>
+    <h3 style="font-size:20px; margin-bottom:8px; color:var(--secondary);">查询上次测评结果</h3>
+    <p style="font-size:14px; color:var(--text-light); margin-bottom:20px;">输入你的姓名和二级部门，查看最近一次测评结果</p>
+    <input type="text" id="query-name" placeholder="请务必填写真实姓名，否则不予中奖" style="width:100%; padding:12px 16px; border:2px solid var(--border); border-radius:10px; font-size:15px; margin-bottom:12px; font-family:inherit;">
+    <select id="query-dept" style="width:100%; padding:12px 16px; border:2px solid var(--border); border-radius:10px; font-size:15px; margin-bottom:16px; font-family:inherit; background:var(--card); color:var(--text); appearance:auto;">
+        <option value="">请选择二级部门</option>
+        <option value="基础框架部">基础框架部</option>
+        <option value="文档产研部">文档产研部</option>
+        <option value="Office服务研发部">Office服务研发部</option>
+        <option value="PC多平台产研部">PC多平台产研部</option>
+        <option value="移动产研部">移动产研部</option>
+        <option value="表格产研部">表格产研部</option>
+        <option value="演示产研部">演示产研部</option>
+        <option value="Office云文档产研部">Office云文档产研部</option>
+        <option value="质量保障部">质量保障部</option>
+        <option value="版式产研部">版式产研部</option>
+        <option value="AI创新部">AI创新部</option>
+      </select>
+    <button onclick="doQuery()" style="width:100%; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit;">查询</button>
+    <div id="query-result" style="margin-top:16px; display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== ALL RESULTS MODAL ===== -->
+<div id="all-results-modal">
+  <div class="modal-content">
+    <h2>🔍 全部10种职场人格</h2>
+    <div id="all-results-list"></div>
+    <button class="modal-close" onclick="closeAllResults()">关闭</button>
+  </div>
+</div>
+
+<!-- ===== PERSONALITY DETAIL MODAL ===== -->
+<div id="personality-detail-modal">
+  <div class="detail-content">
+    <button class="detail-close" onclick="closePersonalityDetail()">&times;</button>
+    <div class="detail-header">
+      <img id="detail-img" src="" alt="" loading="lazy">
+      <div>
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-tagline" id="detail-tagline"></div>
+      </div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA（/static/quiz-data.json 异步加载，缩短首屏）=====
+var QUESTIONS, PERSONALITY_TEXTS, PATTERNS, Q_IDS;
+var OPTION_POINTS, SCORE_BANDS, HANDBOOK_FIVE_D;
+var __maxFiveDWeightsCache = null;
+async function loadQuizData() {
+  var res = await fetch('/static/quiz-data.json', { cache: 'no-store' });
+  if (!res.ok) throw new Error('题库加载失败（HTTP ' + res.status + '）');
+  var pack = await res.json();
+  QUESTIONS = pack.questions;
+  PERSONALITY_TEXTS = pack.personalityTexts;
+  PATTERNS = pack.patterns;
+  Q_IDS = QUESTIONS.map(function(q) { return q.id; });
+  OPTION_POINTS = (pack.scoring && pack.scoring.optionPoints) || { A: 3, B: 1, C: 2 };
+  SCORE_BANDS = pack.scoreBands || null;
+  HANDBOOK_FIVE_D = pack.handbookFiveD || null;
+  __maxFiveDWeightsCache = null;
+}
+
+const EMOJI_MAP = {
+  '锅の传人': '🧑‍🔧', '单机战神': '🥷', '流程护法': '📋', '急急国王': '⚡',
+  '扛把子': '🦸', '天选牛马': '🐎', '饼饼粉碎机': '🔗', '群聊气氛组': '🎉',
+  '消息黑洞': '👻', 'Ctrl+Z 终身成就奖得主': '♾️'
+};
+
+const IMG_MAP = {
+  '锅の传人': 'guo', '单机战神': 'danzhan', '流程护法': 'liucheng',
+  '急急国王': 'jiji', '扛把子': 'kang', '天选牛马': 'niuma',
+  '饼饼粉碎机': 'bing', '群聊气氛组': 'qiliao', '消息黑洞': 'heidong',
+  'Ctrl+Z 终身成就奖得主': 'ctrlz'
+};
+
+// ===== STATE =====
+var state = { answers: {}, currentQ: 0 };
+
+// ===== START =====
+
+
+// ===== QUERY RESULT =====
+function showQueryModal() {
+  document.getElementById('query-modal').style.display = 'flex';
+  document.getElementById('query-name').value = '';
+  // empId removed
+  document.getElementById('query-result').style.display = 'none';
+}
+
+function closeQueryModal() {
+  document.getElementById('query-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function doQuery() {
+  const name = document.getElementById('query-name').value.trim();
+  const dept = document.getElementById('query-dept').value;
+  const resultDiv = document.getElementById('query-result');
+
+  if (!name) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<p style="color:var(--primary); font-size:14px;">请输入姓名</p>';
+    return;
+  }
+  if (!dept) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<p style="color:var(--primary); font-size:14px;">请选择二级部门</p>';
+    return;
+  }
+
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<p style="color:var(--text-light); font-size:14px;">查询中...</p>';
+
+  fetch('/api/query', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name: name, dept: dept})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      resultDiv.innerHTML = '<p style="color:var(--primary); font-size:14px;">' + (data.message || '未找到记录') + '</p>';
+      return;
+    }
+    const r = data.record;
+    const imgName = IMG_MAP[r.result] || 'guo';
+    const tagMatch = PERSONALITY_TEXTS[r.result].match(/\*\*——\s*"(.+?)"\*\*/);
+    const tagline = tagMatch ? tagMatch[1] : '';
+    const text = PERSONALITY_TEXTS[r.result];
+    const descLines = text.split('\n').filter(l => l.trim() && !l.startsWith('###') && !l.startsWith('**——') && !l.startsWith('|') && !l.startsWith('>'));
+    const snippet = descLines.join('').substring(0, 80) + '...';
+        resultDiv.innerHTML = `
+      <div style="background:#f9fafb; border-radius:12px; padding:16px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <img src="/static/${imgName}.jpg" alt="${r.result}" style="width:56px; height:56px; border-radius:0; object-fit:cover; flex-shrink:0; border:2px solid var(--primary-light);">
+          <div style="flex:1;">
+            <div style="font-size:22px; font-weight:700;">${r.result}</div>
+            <div style="font-size:13px; color:var(--primary);">"${tagline}"</div>
+          </div>
+        </div>
+        <div style="font-size:13px; color:var(--text-light); line-height:1.6; margin-bottom:6px;">${snippet}</div>
+        <button class="view-detail-btn" onclick="showPersonalityDetail('${r.result}')">查看完整解读</button>
+        <div style="font-size:12px; color:#999; border-top:1px solid #eee; padding-top:8px; margin-top:10px;">${r.time}</div>
+      </div>
+    `;
+  })
+  .catch(err => {
+    resultDiv.innerHTML = '<p style="color:var(--primary); font-size:14px;">查询失败，请稍后重试</p>';
+  });
+}
+
+// ===== QR CODE =====
+function showQRCode(url) {
+  var section = document.getElementById('qr-share-section');
+  var container = document.getElementById('qrcode');
+  if (!section || !container) return;
+  if (container.querySelector('img')) {
+    section.style.display = 'block';
+    return;
+  }
+  container.innerHTML = '<div style="width:160px;height:160px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999;text-align:center;">二维码生成中…</div>';
+  section.style.display = 'block';
+  var img = new Image();
+  img.alt = 'QR Code';
+  img.style.borderRadius = '8px';
+  img.onload = function() {
+    container.innerHTML = '';
+    container.appendChild(img);
+  };
+  img.onerror = function() {
+    container.innerHTML = '<p style="font-size:12px;color:#c0392b;padding:8px;">二维码加载失败，请刷新重试</p>';
+  };
+  img.src = '/api/qr?box=5&data=' + encodeURIComponent(url);
+}
+
+function startQuiz() {
+  var name = document.getElementById('field-name').value.trim();
+  var dept = document.getElementById('field-dept').value.trim();
+  var regionSelect = document.getElementById('field-region');
+  var region = regionSelect.value;
+  var errEl = document.getElementById('form-error');
+
+  if (!name) { errEl.textContent = '请输入姓名'; return; }
+  if (!dept) { errEl.textContent = '请输入二级部门'; return; }
+  if (!region) { errEl.textContent = '请选择区域'; return; }
+
+  errEl.textContent = '';
+
+  state.userInfo = { name: name, dept: dept, region: region };
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  // 显示二维码以供分享
+  showQRCode(window.location.href);
+  renderQuestion(0);
+}
+
+// ===== RENDER QUESTION =====
+function renderQuestion(index) {
+  const container = document.getElementById('question-container');
+  const q = QUESTIONS[index];
+  const total = QUESTIONS.length;
+  
+  document.getElementById('progress-text').textContent = `${index + 1} / ${total}`;
+  document.getElementById('progress-fill').style.width = `${((index + 1) / total) * 100}%`;
+  
+  const selected = state.answers[q.id] || null;
+  
+  let optsHtml = q.options.map(o => `
+    <button class="option-btn${selected === o.key ? ' selected' : ''}" onclick="selectOption('${q.id}', '${o.key}')">
+      <span class="opt-key">${o.key}</span>
+      <span>${o.text}</span>
+    </button>
+  `).join('');
+  
+  const isLast = index === total - 1;
+  const hasAnswer = state.answers[q.id] != null;
+  
+  container.innerHTML = `
+    <div class="question-card">
+      <div class="q-number">第 ${index + 1} 题</div>
+      <div class="q-title">${q.title}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="quiz-nav">
+        ${index > 0 ? `<button class="btn-nav prev" onclick="prevQuestion()">← 上一题</button>` : '<div></div>'}
+        <button class="btn-nav next" onclick="${isLast ? 'submitQuiz()' : 'nextQuestion()'}" ${!hasAnswer ? 'disabled' : ''}>
+          ${isLast ? '🎯 查看结果' : '下一题 →'}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectOption(qId, key) {
+  state.answers[qId] = key;
+  // Re-render current question to update button states
+  renderQuestion(state.currentQ);
+}
+
+function nextQuestion() {
+  if (state.currentQ < QUESTIONS.length - 1) {
+    state.currentQ++;
+    renderQuestion(state.currentQ);
+  }
+}
+
+function prevQuestion() {
+  if (state.currentQ > 0) {
+    state.currentQ--;
+    renderQuestion(state.currentQ);
+  }
+}
+
+// ===== 手册 V4：总分 + 区间主分型 + 边界五维余弦 =====
+function computeHandbookTotalScore(answers) {
+  var pts = OPTION_POINTS || { A: 3, B: 1, C: 2 };
+  var sum = 0;
+  for (var i = 1; i <= 21; i++) {
+    var k = answers['Q' + i] || 'B';
+    sum += pts[k] != null ? pts[k] : 1;
+  }
+  return sum;
+}
+
+function bandByScore(score) {
+  var bands = SCORE_BANDS;
+  if (!bands || !bands.length) return null;
+  for (var j = 0; j < bands.length; j++) {
+    if (score >= bands[j].min && score <= bands[j].max) return bands[j];
+  }
+  if (score < bands[0].min) return bands[0];
+  return bands[bands.length - 1];
+}
+
+function adjacentBandPair(score) {
+  var bands = SCORE_BANDS;
+  if (!bands) return null;
+  for (var j = 0; j < bands.length - 1; j++) {
+    if (score === bands[j].max || score === bands[j + 1].min) return [bands[j].name, bands[j + 1].name];
+  }
+  return null;
+}
+
+function computeUser5D(answers, keyWeights) {
+  var wmap = (HANDBOOK_FIVE_D && HANDBOOK_FIVE_D.questionDimensionWeights) || {};
+  var pts = OPTION_POINTS || { A: 3, B: 1, C: 2 };
+  var keys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  var vec = { drive: 0, relate: 0, structure: 0, boundary: 0, pace: 0 };
+  for (var i = 1; i <= 21; i++) {
+    var qid = 'Q' + i;
+    var ch = answers[qid] || 'B';
+    var level = (pts[ch] - 1) / 2;
+    // V4.5: 反向题处理（Reverse Coding）
+    if (qid === 'Q17' && ch === 'C') level = 1 - level;       // 「开心就好」对 drive 取反
+    if (qid === 'Q19' && ch === 'A') level = level * 0.65;    // 「黑话包装」对 structure 软惩罚
+    if (qid === 'Q20' && ch === 'C') level = level * 0.7;     // 「伪装读文档」对 pace 软惩罚
+    var wq = wmap[qid] || {};
+    var kw = (keyWeights && keyWeights[qid]) || 1;
+    for (var k = 0; k < keys.length; k++) {
+      var d = keys[k];
+      vec[d] += (wq[d] || 0) * level * kw;
+    }
+  }
+  return vec;
+}
+
+function maxFiveDByWeights() {
+  if (__maxFiveDWeightsCache) return __maxFiveDWeightsCache;
+  var wmap = (HANDBOOK_FIVE_D && HANDBOOK_FIVE_D.questionDimensionWeights) || {};
+  var keys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  var maxv = { drive: 0, relate: 0, structure: 0, boundary: 0, pace: 0 };
+  for (var i = 1; i <= 21; i++) {
+    var wq = wmap['Q' + i] || {};
+    for (var k = 0; k < keys.length; k++) {
+      var d = keys[k];
+      maxv[d] += (wq[d] || 0) * 1;
+    }
+  }
+  __maxFiveDWeightsCache = maxv;
+  return maxv;
+}
+
+function vecCosine5(u, c) {
+  if (!u || !c) return 0;
+  var keys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  var dot = 0, nu = 0, nv = 0;
+  for (var i = 0; i < keys.length; i++) {
+    var d = keys[i];
+    var a = u[d] || 0, b = c[d] || 0;
+    dot += a * b;
+    nu += a * a;
+    nv += b * b;
+  }
+  if (nu < 1e-12 || nv < 1e-12) return 0;
+  return dot / (Math.sqrt(nu) * Math.sqrt(nv));
+}
+
+function matchPersonalityHandbook(answers) {
+  var score = computeHandbookTotalScore(answers);
+  var band = bandByScore(score);
+  var displayName = band ? band.name : '消息黑洞';
+  var pair = adjacentBandPair(score);
+  var cents = HANDBOOK_FIVE_D && HANDBOOK_FIVE_D.personalityCentroids;
+  var keys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  if (pair && cents) {
+    // V4.5: 关键题加权表（仅边界余弦时生效）
+    var KEY_ITEM_WEIGHTS = {
+      '锅の传人': {'Q4': 1.45, 'Q2': 1.35, 'Q14': 1.25},
+      '单机战神': {'Q9': 1.5, 'Q3': 1.35, 'Q12': 1.3},
+      '流程护法': {'Q18': 1.55, 'Q7': 1.4, 'Q19': 1.35},
+      '急急国王': {'Q11': 1.5, 'Q20': 1.35, 'Q5': 1.25},
+      '扛把子': {'Q15': 1.4, 'Q10': 1.35, 'Q8': 1.3},
+      '天选牛马': {'Q5': 1.45, 'Q17': 1.5, 'Q4': 1.25},
+      '饼饼粉碎机': {'Q9': 1.4, 'Q1': 1.3, 'Q18': 1.35},
+      '群聊气氛组': {'Q13': 1.45, 'Q15': 1.4, 'Q9': 1.3},
+      '消息黑洞': {'Q15': 1.5, 'Q9': 1.45, 'Q8': 1.25},
+      'Ctrl+Z 终身成就奖得主': {'Q21': 1.45, 'Q14': 1.4, 'Q7': 1.35}
+    };
+    // L2 归一化辅助函数
+    function l2normObj(obj) {
+      var v = {};
+      for (var i = 0; i < keys.length; i++) v[keys[i]] = obj[keys[i]] || 0;
+      var s = 0;
+      for (var i = 0; i < keys.length; i++) s += v[keys[i]] * v[keys[i]];
+      var n = Math.sqrt(s);
+      if (n > 1e-12) for (var i = 0; i < keys.length; i++) v[keys[i]] /= n;
+      return v;
+    }
+    var u0 = l2normObj(computeUser5D(answers, KEY_ITEM_WEIGHTS[pair[0]]));
+    var u1 = l2normObj(computeUser5D(answers, KEY_ITEM_WEIGHTS[pair[1]]));
+    var c0 = l2normObj(cents[pair[0]]);
+    var c1 = l2normObj(cents[pair[1]]);
+    var s0 = vecCosine5(u0, c0);
+    var s1 = vecCosine5(u1, c1);
+    if (s1 > s0) displayName = pair[1];
+    else displayName = pair[0];
+  }
+  return { displayName: displayName, totalScore: score };
+}
+
+function hammingToPattern(choices, patternArr) {
+  var h = 0;
+  for (var i = 0; i < 21; i++) {
+    if (choices[i] !== patternArr[i]) h++;
+  }
+  return h;
+}
+
+// ===== SUBMIT & MATCH =====
+function submitQuiz() {
+  if (window.__cbtiSubmitting) return;
+  const Q_IDS = Object.keys(state.answers).sort((a, b) => {
+    const na = parseInt(a.replace('Q',''));
+    const nb = parseInt(b.replace('Q',''));
+    return na - nb;
+  });
+  const choices = Q_IDS.map(qid => state.answers[qid] || 'A');
+
+  var displayName, totalScore, bestScore;
+  if (SCORE_BANDS && SCORE_BANDS.length && HANDBOOK_FIVE_D) {
+    var mh = matchPersonalityHandbook(state.answers);
+    displayName = mh.displayName;
+    totalScore = mh.totalScore;
+    bestScore = hammingToPattern(choices, PATTERNS[displayName] || []);
+  } else {
+    let bestPersonality = null;
+    bestScore = 999;
+    for (const [pName, pattern] of Object.entries(PATTERNS)) {
+      let haming = 0;
+      for (let i = 0; i < 21; i++) {
+        if (choices[i] !== pattern[i]) haming++;
+      }
+      if (haming < bestScore) {
+        bestScore = haming;
+        bestPersonality = pName;
+      }
+    }
+    displayName = bestPersonality;
+    if (bestPersonality === 'Ctrl+Z终身成就奖得主') displayName = 'Ctrl+Z 终身成就奖得主';
+    totalScore = null;
+  }
+
+
+
+  const dims = [];
+  const submitId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('s' + Date.now() + '-' + Math.random().toString(36).slice(2, 11));
+  const payload = {
+    name: state.userInfo?.name || '',
+    
+    dept: state.userInfo?.dept || '',
+    region: state.userInfo?.region || '',
+    result: displayName,
+    haming: bestScore,
+
+    answers: state.answers,
+    submitId: submitId
+  };
+  if (totalScore != null) payload.totalScore = totalScore;
+
+  var overlay = document.getElementById('submit-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  window.__cbtiSubmitting = true;
+
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  function tryPost(attempt) {
+    return fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r) {
+      return r.json().then(function(data) {
+        if (r.ok && data.ok) return data;
+        if (r.status >= 500 && attempt < 3) {
+          return sleep(1000 * Math.pow(2, attempt)).then(function() { return tryPost(attempt + 1); });
+        }
+        throw new Error((data && data.message) || ('HTTP ' + r.status));
+      });
+    }).catch(function(err) {
+      var net = err && (err.name === 'TypeError' || /fetch|network|Failed to fetch/i.test(String(err.message || err)));
+      if (net && attempt < 3) {
+        return sleep(1000 * Math.pow(2, attempt)).then(function() { return tryPost(attempt + 1); });
+      }
+      throw err;
+    });
+  }
+
+  tryPost(0).then(function(data) {
+    if (!data || !data.ok) throw new Error((data && data.message) || '保存失败');
+    window.__cbtiSubmitting = false;
+    if (overlay) overlay.style.display = 'none';
+    showResult(displayName, bestScore, totalScore);
+  }).catch(function(err) {
+    window.__cbtiSubmitting = false;
+    if (overlay) overlay.style.display = 'none';
+    alert('结果保存失败，请检查网络后重试：' + (err && err.message ? err.message : err));
+  });
+}
+
+
+function showResult(name, haming, totalScore) {
+  document.body.style.overflow = '';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  
+  const text = PERSONALITY_TEXTS[name];
+  const emoji = EMOJI_MAP[name] || '🧑‍💼';
+  
+  // Parse tagline
+  let tagline = '';
+  const tagMatch = text.match(/\*\*——\s*"(.+?)"\*\*/);
+  if (tagMatch) tagline = tagMatch[0].replace(/\*\*/g, '').trim();
+  
+  // Parse description and comfort
+  let descHtml = '';
+  let comfortHtml = '';
+  
+  const lines = text.split('\n').filter(l => l.trim());
+  let inComfort = false;
+  let descLines = [];
+  let comfortLines = [];
+  
+  for (const line of lines) {
+    if (line.trim().startsWith('> **安慰：')) {
+      inComfort = true;
+      comfortLines.push(line.replace(/^>\s*\*\*安慰：\*\*/, '').trim());
+      continue;
+    }
+    if (inComfort) {
+      if (line.startsWith('|')) continue;
+      comfortLines.push(line.trim());
+      continue;
+    }
+    if (line.startsWith('### ') || line.startsWith('**——')) continue;
+    if (line.startsWith('|')) continue;
+    if (line.trim()) descLines.push(line.trim());
+  }
+  
+  descHtml = descLines.map(l => `<p>${l}</p>`).join('');
+  comfortHtml = comfortLines.join('<br>');
+  
+  // Fill result
+  document.getElementById('result-emoji').textContent = emoji;
+  // Set personality image
+  var imgEl = document.getElementById('result-img');
+  var imgName = name.replace(/\s+/g, '_').replace('Ctrl+Z_', 'ctrlz_');
+  // imgMap is defined globally below
+  imgEl.src = '/static/' + (IMG_MAP[name] || 'guo') + '.jpg';
+  document.getElementById('result-name').textContent = name;
+  document.getElementById('result-tagline').textContent = tagline;
+  document.getElementById('result-desc').innerHTML = `
+    ${descHtml}
+    <div class="comfort">
+      <strong>💌 安慰一下：</strong>
+      <p>${comfortHtml}</p>
+    </div>
+  `;
+  
+  var fiveKeys = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+  var user5d = HANDBOOK_FIVE_D ? computeUser5D(state.answers) : null;
+  var maxv = HANDBOOK_FIVE_D ? maxFiveDByWeights() : null;
+  setTimeout(function() {
+    if (!user5d || !maxv) return;
+    for (var fi = 0; fi < fiveKeys.length; fi++) {
+      var dk = fiveKeys[fi];
+      var raw = user5d[dk] || 0;
+      var mx = maxv[dk] || 1;
+      var disp = Math.min(5, Math.max(0, (5 * raw) / mx));
+      var vel = document.getElementById('five-d-val-' + dk);
+      var bar = document.getElementById('five-d-bar-' + dk);
+      if (vel) vel.textContent = disp.toFixed(1);
+      if (bar) {
+        bar.style.width = (disp / 5 * 100) + '%';
+        var dimColors = ['#e8513a', '#ffb347', '#4a90d9', '#7cb342', '#9b59b6'];
+        bar.style.background = dimColors[fi] || '#bbb';
+      }
+    }
+  }, 300);
+  
+  var matchLine = totalScore != null
+    ? `人格判定：总分 ${totalScore} 分（A=3 / B=1 / C=2）命中区间；相邻分界处用手册五维余弦微调 · 与「${name}」参考选项串吻合 ${21 - haming} 题（Hamming=${haming}）`
+    : `匹配度：21 题中与参考模式吻合 ${21 - haming} 项（Hamming 距离 = ${haming}）`;
+  document.getElementById('match-info').textContent = matchLine;
+  
+  // QR Code
+  generateQR();
+  
+  // Also generate all results list for modal
+  generateAllResultsList();
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// ===== QUERY RESULT =====
+function generateQR() {
+  var url = window.location.href;
+  var qrContainer = document.getElementById('qr-code');
+  if (!qrContainer) return;
+  qrContainer.innerHTML = '<div style="width:140px;height:140px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);text-align:center;">二维码生成中…</div>';
+  var img = new Image();
+  img.alt = 'QR Code';
+  img.style.width = '140px';
+  img.style.height = '140px';
+  img.style.borderRadius = '8px';
+  img.onload = function() {
+    qrContainer.innerHTML = '';
+    qrContainer.appendChild(img);
+  };
+  img.onerror = function() {
+    qrContainer.innerHTML = '<p style="color:var(--text-light);font-size:13px;">二维码加载失败，请刷新重试</p>';
+  };
+  img.src = '/api/qr?box=5&data=' + encodeURIComponent(url);
+}
+
+// ===== ALL RESULTS =====
+function generateAllResultsList() {
+  const container = document.getElementById('all-results-list');
+  const names = ['消息黑洞','流程护法','天选牛马','单机战神','群聊气氛组','饼饼粉碎机','Ctrl+Z 终身成就奖得主','急急国王','扛把子','锅の传人'];
+
+  let html = '';
+  for (const name of names) {
+    const emoji = EMOJI_MAP[name] || '🧑‍💼';
+    const imgName = IMG_MAP[name] || 'guo';
+    const tagMatch = PERSONALITY_TEXTS[name].match(/\*\*——\s*"(.+?)"\*\*/);
+    const tagline = tagMatch ? tagMatch[1] : '';
+
+    const text = PERSONALITY_TEXTS[name];
+    const lines = text.split('\n').filter(l => l.trim() && !l.startsWith('###') && !l.startsWith('**——') && !l.startsWith('|') && !l.startsWith('>'));
+    const snippet = lines.join('').substring(0, 80) + '...';
+
+    html += `
+      <div style="background:var(--bg); border-radius:12px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+          <img src="/static/${imgName}.jpg" alt="${name}" style="width:48px; height:48px; border-radius:0; object-fit:cover; flex-shrink:0;">
+          <div style="flex:1;">
+            <strong style="font-size:16px;">${name}</strong>
+            <div style="font-size:13px; color:var(--primary);">"${tagline}"</div>
+          </div>
+        </div>
+        <div style="font-size:13px; color:var(--text-light); line-height:1.6; margin-bottom:6px;">${snippet}</div>
+        <button class="view-detail-btn" onclick="showPersonalityDetail('${name}')">查看完整解读</button>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function showPersonalityDetail(name) {
+  try {
+    // 关闭查询弹窗避免z-index干扰
+    var qm = document.getElementById('query-modal');
+    if (qm) { qm.style.display = 'none'; document.body.style.overflow = ''; }
+  } catch(e) { /* ignore */ }
+  try {
+    const imgName = IMG_MAP[name] || 'guo';
+    const tagMatch = PERSONALITY_TEXTS[name].match(/\*\*——\s*"(.+?)"\*\*/);
+    const tagline = tagMatch ? tagMatch[1] : '';
+    const text = PERSONALITY_TEXTS[name];
+    const lines = text.split('\n');
+    let mainHtml = '';
+    let comfortHtml = '';
+    let inComfort = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      if (trimmed.startsWith('###')) continue;
+      if (trimmed.startsWith('**——')) continue;
+      if (trimmed.startsWith('|')) continue;
+      if (trimmed.startsWith('> **安慰：**') || trimmed.startsWith('> **安慰**')) {
+        inComfort = true;
+        mainHtml = mainHtml.replace(/<br>$/, '');
+        continue;
+      }
+      if (trimmed.startsWith('>')) {
+        comfortHtml += trimmed.replace(/^>\s*/, '') + '<br>';
+        continue;
+      }
+      if (inComfort) {
+        comfortHtml += trimmed + '<br>';
+      } else {
+        mainHtml += trimmed + '<br>';
+      }
+    }
+    comfortHtml = comfortHtml.replace(/<br>$/, '');
+
+    var dimOrder = ['drive', 'relate', 'structure', 'boundary', 'pace'];
+    var dimLabels = { drive: '推动力', relate: '关系力', structure: '规则与闭环', boundary: '边界与自我', pace: '节奏与恢复' };
+    var dimColors = ['#e8513a', '#ffb347', '#4a90d9', '#7cb342', '#9b59b6'];
+    var cents = HANDBOOK_FIVE_D && HANDBOOK_FIVE_D.personalityCentroids && HANDBOOK_FIVE_D.personalityCentroids[name];
+    var dimsHtml = '<div style="font-size:12px; color:#888; margin:12px 0 8px;">以下为该人格在手册中的五维参考质心（0～5 分示意，便于对照）</div>';
+    dimsHtml += '<div style="display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; justify-content:center;">';
+    if (cents) {
+      for (var di = 0; di < dimOrder.length; di++) {
+        var dk = dimOrder[di];
+        var v = (cents[dk] != null ? cents[dk] : 0) * 5;
+        var w = Math.min(100, Math.max(0, v / 5 * 100));
+        dimsHtml += '<div style="text-align:center; flex:1; min-width:72px; max-width:100px;"><div style="font-size:10px; color:#999; margin-bottom:4px; line-height:1.2;">' + dimLabels[dk] + '</div><div style="width:100%; height:6px; background:#eee; border-radius:3px;"><div style="width:' + w + '%; height:6px; background:' + dimColors[di] + '; border-radius:3px;"></div></div><div style="font-size:12px; font-weight:700; margin-top:2px; color:' + dimColors[di] + ';">' + v.toFixed(1) + '</div></div>';
+      }
+    } else {
+      dimsHtml += '<div style="font-size:13px; color:#999;">暂无五维参考数据</div>';
+    }
+    dimsHtml += '</div>';
+
+    document.getElementById('detail-img').src = '/static/' + imgName + '.jpg';
+    document.getElementById('detail-title').textContent = name;
+    document.getElementById('detail-tagline').textContent = '"' + tagline + '"';
+    document.getElementById('detail-body').innerHTML = dimsHtml + '<div style="line-height:1.8; font-size:14px; color:var(--text-light);">' + mainHtml + '</div>' + (comfortHtml ? '<div style="background:var(--primary-light); border-radius:10px; padding:14px; margin-top:14px;"><strong style="color:var(--primary);">💌 安慰一下：</strong><br><span style="font-size:14px; color:var(--text-light); line-height:1.6;">' + comfortHtml + '</span></div>' : '');
+    document.getElementById('personality-detail-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } catch(e) {
+    console.error('showPersonalityDetail error:', e);
+    alert('加载详细解读失败：' + e.message);
+  }
+}
+
+function closePersonalityDetail() {
+  document.getElementById('personality-detail-modal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function showAllResults() {
+  document.getElementById('all-results-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAllResults() {
+  document.getElementById('all-results-modal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ===== RESTART =====
+function restartQuiz() {
+  window.__cbtiSubmitting = false;
+  state = { answers: {}, currentQ: 0 };
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'flex';
+  document.querySelectorAll('.dim-bar-fill').forEach(el => el.style.width = '0%');
+  ['drive','relate','structure','boundary','pace'].forEach(function(dk) {
+    var el = document.getElementById('five-d-val-' + dk);
+    if (el) el.textContent = '0';
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== 启动：题库加载完成后再展示主界面（不等待全部图片）=====
+
+
+function revealApp() {
+  var loading = document.getElementById('app-loading');
+  var content = document.getElementById('app-content');
+  if (loading) loading.style.display = 'none';
+  if (content) {
+    content.style.display = 'block';
+    content.classList.add('ready');
+  }
+  try { showQRCode(window.location.href); } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadQuizData().then(function() {
+    setTimeout(revealApp, 80);
+  }).catch(function(err) {
+    var loading = document.getElementById('app-loading');
+    if (loading) {
+      loading.innerHTML = '<div style="padding:32px;text-align:center;color:#c0392b;font-size:15px;">加载题库失败，请刷新重试<br><span style="color:#666;font-size:13px;">' + (err && err.message ? err.message : err) + '</span></div>';
+    }
+  });
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (e.key === '1') document.querySelectorAll('.option-btn')[0]?.click();
+  if (e.key === '2') document.querySelectorAll('.option-btn')[1]?.click();
+  if (e.key === '3') document.querySelectorAll('.option-btn')[2]?.click();
+});
+
+</script>
+
+<!-- Railway 冷启动保护：每4分钟ping一次 /health 保持服务唤醒 -->
+<script>
+(function() {
+  function keepAlive() {
+    if (document.hidden) return;
+    fetch('/health', { method: 'GET', cache: 'no-store' }).catch(function() {});
+  }
+  keepAlive();
+  setInterval(keepAlive, 4 * 60 * 1000);
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) keepAlive();
+  });
+})();
+</script>
+
+</div>
+
+<!-- 首屏显示改由题库 JSON 加载完成后触发（revealApp） -->
+
+
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBTI 数据管理后台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  padding: 24px 20px;
+}
+
+/* ===== Header ===== */
+.header {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header h1 { font-size: 22px; color: #1a3a5c; }
+.header .stats { font-size: 13px; color: #888; }
+.header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+button.btn { text-align: center; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-primary { background: #1a3a5c; color: white; }
+.btn-primary:hover { background: #2a5a8c; }
+.btn-export { background: #28a745; color: white; }
+.btn-export:hover { background: #34ce57; }
+.btn-outline { background: transparent; color: #1a3a5c; border: 1px solid #1a3a5c; }
+.btn-outline:hover { background: #1a3a5c; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-danger:hover { background: #c82333; }
+
+/* ===== Analytics Dashboard ===== */
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.dash-card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.dash-card .label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dash-card .number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a3a5c;
+}
+.dash-card .sub {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 2px;
+}
+.dash-card.highlight {
+  background: linear-gradient(135deg, #1a3a5c 0%, #2a5a8c 100%);
+  color: white;
+}
+.dash-card.highlight .label { color: rgba(255,255,255,0.7); }
+.dash-card.highlight .number { color: white; }
+.dash-card.highlight .sub { color: rgba(255,255,255,0.5); }
+
+.chart-section {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.chart-card h3 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.bar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.bar-item .bar-label {
+  font-size: 12px;
+  color: #555;
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-item .bar-track {
+  flex: 1;
+  height: 20px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.bar-item .bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  min-width: 20px;
+}
+.bar-item .bar-count {
+  font-size: 12px;
+  color: #999;
+  width: 30px;
+  flex-shrink: 0;
+}
+
+/* ===== Column Toggle ===== */
+.toolbar {
+  max-width: 1400px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.toolbar .toggle-label {
+  font-size: 13px;
+  color: #888;
+  margin-right: 4px;
+}
+.col-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  transition: all 0.2s;
+  user-select: none;
+  font-family: inherit;
+}
+.col-toggle:hover { border-color: #1a3a5c; }
+.col-toggle.hidden {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* ===== Table ===== */
+.table-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  background: #1a3a5c;
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+th:hover { background: #2a5a8c; }
+th .sort-icon {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+}
+th.sorted .sort-icon { color: white; }
+th.sorted-asc .sort-icon::after { content: "▲"; }
+th.sorted-desc .sort-icon::after { content: "▼"; }
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+tr:hover td { background: #f8f9fb; }
+tr:last-child td { border-bottom: none; }
+.col-hidden { display: none; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #e8f0fe;
+  color: #1a3a5c;
+}
+.answers-cell {
+  font-size: 11px;
+  color: #aaa;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+.empty-state h2 { font-size: 18px; margin-bottom: 6px; color: #666; }
+
+/* ===== 删除按钮 ===== */
+.btn-small {
+  padding: 3px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.btn-del { background: #fff0f0; color: #dc3545; border: 1px solid #fcc; }
+.btn-del:hover { background: #dc3545; color: white; }
+
+/* ===== Modal ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  text-align: center;
+}
+.modal-box h3 { font-size: 18px; margin-bottom: 10px; color: #333; }
+.modal-box p { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
+.modal-box .actions { display: flex; gap: 10px; justify-content: center; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 99999;
+  display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease;
+}
+.toast.success { background: #28a745; }
+.toast.error { background: #dc3545; }
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ===== Pagination ===== */
+.pagination {
+  max-width: 1400px;
+  margin: 16px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.pagination .page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #555;
+}
+.pagination .page-btn:hover { border-color: #1a3a5c; color: #1a3a5c; }
+.pagination .page-btn.active {
+  background: #1a3a5c;
+  color: white;
+  border-color: #1a3a5c;
+  font-weight: 700;
+}
+.pagination .page-btn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.pagination .page-info {
+  font-size: 13px;
+  color: #888;
+  margin: 0 8px;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { height: 6px; width: 6px; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div>
+    <h1>CBTI 测评数据管理后台</h1>
+    <div class="stats">共 <strong>{{ total }}</strong> 条记录 · 每页 {{ page_size }} 条 · 默认<strong>最新在上</strong> · 点击表头可排序</div>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn btn-export" onclick="exportCsvDownload()">导出 CSV</button>
+    <button type="button" class="btn btn-outline" onclick="exportNdjsonDownload()" title="全量备份">导出 NDJSON</button>
+    <a href="/api/data?page=1&amp;per_page=200" class="btn btn-outline" target="_blank" title="分页 JSON">查看 JSON</a>
+    <a href="/api/data?legacy_array=1&amp;max_rows=5000" class="btn btn-outline" target="_blank" title="最多 5000 条数组（慎用）">JSON 数组</a>
+    {% if total > 0 %}
+    <button class="btn btn-danger" onclick="showClearModal()">清空全部数据</button>
+    {% endif %}
+    <a href="/" class="btn btn-primary">返回问卷</a>
+    <a href="/admin/logout" class="btn btn-outline" style="border-color:#dc3545;color:#dc3545;" onclick="return confirm('确认退出登录？')">退出登录</a>
+  </div>
+</div>
+
+<!-- ===== ANALYTICS DASHBOARD ===== -->
+<div class="dashboard">
+  <div class="dash-card highlight">
+    <div class="label">参与总人数</div>
+    <div class="number">{{ total }}</div>
+    <div class="sub">累计完成测评</div>
+  </div>
+  <div class="dash-card">
+    <div class="label">覆盖区域</div>
+    <div class="number">{{ region_stats|length }}</div>
+    <div class="sub">{% for reg in region_stats.keys() %}{{ reg }}{% if not loop.last %}、{% endif %}{% endfor %}</div>
+  </div>
+  <div class="dash-card">
+    <div class="label">涉及部门</div>
+    <div class="number">{{ dept_stats|length }}</div>
+    <div class="sub">共 {{ total }} 人次参与</div>
+  </div>
+  <div class="dash-card">
+    <div class="label">人格种类</div>
+    <div class="number">{{ result_stats|length }}</div>
+    <div class="sub">已覆盖 {{ result_stats|length }} 种人格类型</div>
+  </div>
+</div>
+
+<!-- ===== CHARTS ===== -->
+<div class="chart-section">
+  <div class="chart-card">
+    <h3>区域分布</h3>
+    {% for reg, count in region_stats | dictsort(by='value', reverse=True) %}
+    <div class="bar-item">
+      <span class="bar-label">{{ reg }}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (count / total * 100)|round(1) if total > 0 else 0 }}%; background:#4a90d9;">{{ count }}</div>
+      </div>
+      <span class="bar-count">{{ count }}</span>
+    </div>
+    {% endfor %}
+    {% if not region_stats %}
+    <div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">暂无数据</div>
+    {% endif %}
+  </div>
+  <div class="chart-card">
+    <h3>部门分布</h3>
+    {% for dept, count in dept_stats | dictsort(by='value', reverse=True) %}
+    <div class="bar-item">
+      <span class="bar-label">{{ dept }}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (count / total * 100)|round(1) if total > 0 else 0 }}%; background:#e8513a;">{{ count }}</div>
+      </div>
+      <span class="bar-count">{{ count }}</span>
+    </div>
+    {% endfor %}
+    {% if not dept_stats %}
+    <div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">暂无数据</div>
+    {% endif %}
+  </div>
+  <div class="chart-card">
+    <h3>人格类型分布</h3>
+    {% for res, count in result_stats | dictsort(by='value', reverse=True) %}
+    <div class="bar-item">
+      <span class="bar-label">{{ res }}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (count / total * 100)|round(1) if total > 0 else 0 }}%; background:#ffb347;">{{ count }}</div>
+      </div>
+      <span class="bar-count">{{ count }}</span>
+    </div>
+    {% endfor %}
+    {% if not result_stats %}
+    <div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">暂无数据</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== COLUMN TOGGLE ===== -->
+<div class="toolbar">
+  <span class="toggle-label">显示列：</span>
+  <button class="col-toggle" data-col="col-idx">序号</button>
+  <button class="col-toggle" data-col="col-name">姓名</button>
+  <button class="col-toggle" data-col="col-dept">部门</button>
+  <button class="col-toggle" data-col="col-region">区域</button>
+  <button class="col-toggle" data-col="col-result">测评结果</button>
+  <button class="col-toggle" data-col="col-d1">D1</button>
+  <button class="col-toggle" data-col="col-d2">D2</button>
+  <button class="col-toggle" data-col="col-d3">D3</button>
+  <button class="col-toggle" data-col="col-haming">Haming</button>
+  <button class="col-toggle" data-col="col-answers">答题详情</button>
+  <button class="col-toggle" data-col="col-time">提交时间</button>
+  <button class="col-toggle" data-col="col-actions">操作</button>
+</div>
+
+<!-- ===== TABLE ===== -->
+<div class="table-wrap">
+{% if records %}
+<table id="data-table">
+  <thead>
+    <tr>
+      <th class="col-idx" data-sort="id">序号 <span class="sort-icon"></span></th>
+      <th class="col-name" data-sort="name">姓名 <span class="sort-icon"></span></th>
+      <th class="col-dept" data-sort="dept">部门 <span class="sort-icon"></span></th>
+      <th class="col-region" data-sort="region">区域 <span class="sort-icon"></span></th>
+      <th class="col-result" data-sort="result">测评结果 <span class="sort-icon"></span></th>
+      <th class="col-d1" data-sort="d1">D1 <span class="sort-icon"></span></th>
+      <th class="col-d2" data-sort="d2">D2 <span class="sort-icon"></span></th>
+      <th class="col-d3" data-sort="d3">D3 <span class="sort-icon"></span></th>
+      <th class="col-haming" data-sort="haming">Haming <span class="sort-icon"></span></th>
+      <th class="col-answers">答题详情</th>
+      <th class="col-time" data-sort="time">提交时间 <span class="sort-icon"></span></th>
+      <th class="col-actions">操作</th>
+    </tr>
+  </thead>
+  <tbody id="table-body">
+    {% for r in records %}
+    <tr data-id="{{ r.id }}">
+      <td class="col-idx">{{ total - (page - 1) * page_size - loop.index + 1 }}</td>
+      <td class="col-name">{{ r.name }}</td>
+      <td class="col-dept">{{ r.dept }}</td>
+      <td class="col-region">{{ r.region }}</td>
+      <td class="col-result"><span class="badge">{{ r.result }}</span></td>
+      <td class="col-d1">{{ (r.dims or [])[0] or '-' }}</td>
+      <td class="col-d2">{{ (r.dims or [])[1] or '-' }}</td>
+      <td class="col-d3">{{ (r.dims or [])[2] or '-' }}</td>
+      <td class="col-haming">{{ r.haming }}</td>
+      <td class="col-answers answers-cell" title="{{ r.answers | tojson }}">{{ r.answers | tojson | truncate(40) }}</td>
+      <td class="col-time" style="white-space:nowrap;font-size:12px;color:#888;">{{ r.time }}</td>
+      <td class="col-actions">
+        <button class="btn-small btn-del" onclick="deleteOne({{ r.id }}, '{{ r.name | e }}')">删除</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+  <h2>暂无测评数据</h2>
+  <p>还没有人完成测评，等待数据录入中...</p>
+  <p style="margin-top:10px;"><a href="/" class="btn btn-primary">去完成测评</a></p>
+</div>
+{% endif %}
+</div>
+
+<!-- ===== PAGINATION ===== -->
+{% if total_pages > 1 %}
+<div class="pagination">
+  {% if page > 1 %}
+  <a href="/admin?page=1" class="page-btn">&laquo;</a>
+  <a href="/admin?page={{ page-1 }}" class="page-btn">&lsaquo;</a>
+  {% else %}
+  <span class="page-btn disabled">&laquo;</span>
+  <span class="page-btn disabled">&lsaquo;</span>
+  {% endif %}
+
+  {% set range_start = [1, page-3] | max %}
+  {% set range_end = [total_pages, page+3] | min %}
+
+  {% if range_start > 1 %}
+  <span class="page-btn disabled">...</span>
+  {% endif %}
+
+  {% for p in range(range_start, range_end + 1) %}
+  <a href="/admin?page={{ p }}"
+     class="page-btn {{ 'active' if p == page else '' }}">{{ p }}</a>
+  {% endfor %}
+
+  {% if range_end < total_pages %}
+  <span class="page-btn disabled">...</span>
+  {% endif %}
+
+  {% if page < total_pages %}
+  <a href="/admin?page={{ page+1 }}" class="page-btn">&rsaquo;</a>
+  <a href="/admin?page={{ total_pages }}" class="page-btn">&raquo;</a>
+  {% else %}
+  <span class="page-btn disabled">&rsaquo;</span>
+  <span class="page-btn disabled">&raquo;</span>
+  {% endif %}
+
+  <span class="page-info">第 {{ page }}/{{ total_pages }} 页</span>
+</div>
+{% endif %}
+
+<!-- ===== 确认清空弹窗 ===== -->
+<div class="modal-overlay" id="clearModal">
+  <div class="modal-box">
+    <h3>确认清空所有数据？</h3>
+    <p>此操作将永久删除全部 <strong>{{ total }}</strong> 条测评记录，<br>且不可恢复。请谨慎操作。</p>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeClearModal()">取消</button>
+      <button class="btn btn-danger" onclick="clearAll()">确认清空</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 确认单条删除弹窗 ===== -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <h3>确认删除</h3>
+    <p>确定要删除 <strong id="delName"></strong> 的测评记录吗？</p>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeDeleteModal()">取消</button>
+      <button class="btn btn-danger" id="confirmDelBtn">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ===== Column Toggle =====
+  var toggles = document.querySelectorAll('.col-toggle');
+  toggles.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var colClass = this.getAttribute('data-col');
+      var cells = document.querySelectorAll('.' + colClass);
+      var isHidden = this.classList.toggle('hidden');
+      cells.forEach(function(c) { c.classList.toggle('col-hidden', isHidden); });
+    });
+  });
+
+  // ===== Table Sorting =====
+  var table = document.getElementById('data-table');
+  if (table) {
+    var tbody = document.getElementById('table-body');
+    var headers = table.querySelectorAll('th[data-sort]');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+
+    var colMap = {
+      'id': 'col-idx', 'name': 'col-name', 'dept': 'col-dept',
+'region': 'col-region', 'result': 'col-result',
+      'd1': 'col-d1', 'd2': 'col-d2', 'd3': 'col-d3',
+      'haming': 'col-haming', 'time': 'col-time'
+    };
+
+    headers.forEach(function(th) {
+      th.addEventListener('click', function() {
+        var key = this.getAttribute('data-sort');
+        var colClass = colMap[key] || 'col-' + key;
+        var isAsc = this.classList.contains('sorted-asc');
+
+        headers.forEach(function(h) {
+          h.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+        });
+        this.classList.add('sorted', isAsc ? 'sorted-desc' : 'sorted-asc');
+
+        rows.sort(function(a, b) {
+          var cellA = a.querySelector('.' + colClass);
+          var cellB = b.querySelector('.' + colClass);
+          if (!cellA || !cellB) return 0;
+          var va = cellA.textContent.trim();
+          var vb = cellB.textContent.trim();
+          var na = parseFloat(va), nb = parseFloat(vb);
+          if (!isNaN(na) && !isNaN(nb)) {
+            return isAsc ? na - nb : nb - na;
+          }
+          return isAsc ? va.localeCompare(vb, 'zh-CN') : vb.localeCompare(va, 'zh-CN');
+        });
+        rows.forEach(function(row) { tbody.appendChild(row); });
+      });
+    });
+  }
+})();
+
+// ===== 导出（download 属性触发保存，不经过 JS 堆，大文件也不易崩溃）=====
+function exportCsvDownload() {
+  var a = document.createElement('a');
+  a.href = '/api/export/csv';
+  a.download = 'CBTI测评数据_export.csv';
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('若未开始下载，请检查浏览器是否拦截弹出窗口', 'success');
+}
+
+function exportNdjsonDownload() {
+  var a = document.createElement('a');
+  a.href = '/api/export/ndjson';
+  a.download = 'CBTI_records.ndjson';
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('若未开始下载，请检查浏览器是否拦截弹出窗口', 'success');
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 3000);
+}
+
+// ===== 单条删除 =====
+function deleteOne(id, name) {
+  document.getElementById('delName').textContent = name;
+  document.getElementById('confirmDelBtn').onclick = function() {
+    doDelete(id);
+  };
+  document.getElementById('deleteModal').classList.add('active');
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('active');
+}
+
+function doDelete(id) {
+  closeDeleteModal();
+  fetch('/api/delete/' + id, { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok) {
+        showToast('已删除', 'success');
+        setTimeout(function() { location.reload(); }, 800);
+      } else {
+        showToast('删除失败: ' + (data.message || ''), 'error');
+      }
+    })
+    .catch(function(err) {
+      showToast('请求失败: ' + err.message, 'error');
+    });
+}
+
+// ===== 清空全部 =====
+function showClearModal() {
+  document.getElementById('clearModal').classList.add('active');
+}
+
+function closeClearModal() {
+  document.getElementById('clearModal').classList.remove('active');
+}
+
+function clearAll() {
+  closeClearModal();
+  fetch('/api/clear', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok) {
+        showToast(data.message, 'success');
+        setTimeout(function() { location.reload(); }, 800);
+      } else {
+        showToast('清空失败: ' + (data.message || ''), 'error');
+      }
+    })
+    .catch(function(err) {
+      showToast('请求失败: ' + err.message, 'error');
+    });
+}
+</script>
+<!-- Railway 冷启动保护：每4分钟ping一次 /health 保持服务唤醒 -->
+<script>
+(function() {
+  function keepAlive() {
+    if (document.hidden) return;
+    fetch('/health', { method: 'GET', cache: 'no-store' }).catch(function() {});
+  }
+  keepAlive();
+  setInterval(keepAlive, 4 * 60 * 1000);
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) keepAlive();
+  });
+})();
+</script>
+</body>
+</html>

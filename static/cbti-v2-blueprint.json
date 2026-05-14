@@ -1,0 +1,137 @@
+{
+  "version": 2,
+  "description": "多维计分与人格质心蓝图。含：与 quiz-data.json 对齐的 legacy 线性映射；以及 handbookV4 节点（来自 CBTI_完整手册.docx V4.0 的区间、模式串、A/B/C 分值与手册题维度权重）。",
+  "dimensions": [
+    {"id": "drive", "name": "推动力", "desc": "主动推进、截止与多任务承受"},
+    {"id": "relate", "name": "关系力", "desc": "协作、沟通、团队润滑"},
+    {"id": "structure", "name": "规则与闭环", "desc": "流程、留痕、风险与细节"},
+    {"id": "boundary", "name": "边界与自我", "desc": "拒过载、保护时间与自我定位"},
+    {"id": "pace", "name": "节奏与恢复", "desc": "工作节律与压力下恢复方式"}
+  ],
+  "legacyMatrixLinearMap": {
+    "drive": [0.52, 0.18, -0.12],
+    "relate": [0.12, 0.72, 0.08],
+    "structure": [0.12, 0.1, 0.68],
+    "boundary": [0.28, -0.08, -0.22],
+    "pace": [0.12, 0.22, 0.28]
+  },
+  "legacyMatrixBias": {
+    "drive": 0.08,
+    "relate": 0.05,
+    "structure": 0.06,
+    "boundary": 0.12,
+    "pace": 0.08
+  },
+  "legacyScale": {"min": 1, "max": 5},
+  "questionDimensionWeights": {
+    "Q1": {"drive": 0.35, "relate": 0.45, "structure": 0.1, "boundary": 0.1, "pace": 0.0},
+    "Q2": {"drive": 0.25, "relate": 0.15, "structure": 0.35, "boundary": 0.25, "pace": 0.0},
+    "Q3": {"drive": 0.15, "relate": 0.4, "structure": 0.1, "boundary": 0.35, "pace": 0.0},
+    "Q4": {"drive": 0.3, "relate": 0.35, "structure": 0.1, "boundary": 0.25, "pace": 0.0},
+    "Q5": {"drive": 0.35, "relate": 0.1, "structure": 0.15, "boundary": 0.3, "pace": 0.2},
+    "Q6": {"drive": 0.2, "relate": 0.3, "structure": 0.1, "boundary": 0.4, "pace": 0.0},
+    "Q7": {"drive": 0.25, "relate": 0.15, "structure": 0.45, "boundary": 0.15, "pace": 0.0},
+    "Q8": {"drive": 0.45, "relate": 0.2, "structure": 0.2, "boundary": 0.15, "pace": 0.0},
+    "Q9": {"drive": 0.1, "relate": 0.55, "structure": 0.05, "boundary": 0.3, "pace": 0.0},
+    "Q10": {"drive": 0.3, "relate": 0.35, "structure": 0.1, "boundary": 0.25, "pace": 0.0},
+    "Q11": {"drive": 0.3, "relate": 0.1, "structure": 0.25, "boundary": 0.15, "pace": 0.2},
+    "Q12": {"drive": 0.15, "relate": 0.25, "structure": 0.15, "boundary": 0.45, "pace": 0.0},
+    "Q13": {"drive": 0.1, "relate": 0.5, "structure": 0.05, "boundary": 0.1, "pace": 0.25},
+    "Q14": {"drive": 0.35, "relate": 0.15, "structure": 0.4, "boundary": 0.1, "pace": 0.0},
+    "Q15": {"drive": 0.1, "relate": 0.5, "structure": 0.1, "boundary": 0.1, "pace": 0.2},
+    "Q16": {"drive": 0.4, "relate": 0.15, "structure": 0.2, "boundary": 0.25, "pace": 0.0},
+    "Q17": {"drive": 0.3, "relate": 0.1, "structure": 0.25, "boundary": 0.35, "pace": 0.0},
+    "Q18": {"drive": 0.3, "relate": 0.2, "structure": 0.4, "boundary": 0.1, "pace": 0.0},
+    "Q19": {"drive": 0.15, "relate": 0.2, "structure": 0.35, "boundary": 0.3, "pace": 0.0},
+    "Q20": {"drive": 0.1, "relate": 0.1, "structure": 0.15, "boundary": 0.25, "pace": 0.4},
+    "Q21": {"drive": 0.25, "relate": 0.15, "structure": 0.35, "boundary": 0.15, "pace": 0.1}
+  },
+  "reverseHints": [
+    {"questionId": "Q17", "optionKey": "C", "dimension": "drive", "mode": "invert_level", "note": "「开心就好」对推动力取反或 (1-level)"},
+    {"questionId": "Q19", "optionKey": "A", "dimension": "structure", "mode": "soft_penalty", "factor": 0.65, "note": "周报黑话包装对诚实闭环软惩罚"},
+    {"questionId": "Q20", "optionKey": "C", "dimension": "pace", "mode": "soft_penalty", "factor": 0.7, "note": "伪装读文档对节律自洽降权"}
+  ],
+  "personalityCentroids": {
+    "锅の传人": {"drive": 0.78, "relate": 0.62, "structure": 0.55, "boundary": 0.42, "pace": 0.5},
+    "单机战神": {"drive": 0.72, "relate": 0.28, "structure": 0.58, "boundary": 0.7, "pace": 0.55},
+    "流程护法": {"drive": 0.55, "relate": 0.45, "structure": 0.92, "boundary": 0.48, "pace": 0.45},
+    "急急国王": {"drive": 0.65, "relate": 0.38, "structure": 0.4, "boundary": 0.35, "pace": 0.85},
+    "扛把子": {"drive": 0.75, "relate": 0.72, "structure": 0.58, "boundary": 0.45, "pace": 0.52},
+    "天选牛马": {"drive": 0.5, "relate": 0.35, "structure": 0.45, "boundary": 0.88, "pace": 0.6},
+    "饼饼粉碎机": {"drive": 0.58, "relate": 0.85, "structure": 0.5, "boundary": 0.4, "pace": 0.48},
+    "群聊气氛组": {"drive": 0.48, "relate": 0.88, "structure": 0.42, "boundary": 0.35, "pace": 0.58},
+    "消息黑洞": {"drive": 0.45, "relate": 0.25, "structure": 0.55, "boundary": 0.65, "pace": 0.42},
+    "Ctrl+Z 终身成就奖得主": {"drive": 0.52, "relate": 0.32, "structure": 0.9, "boundary": 0.4, "pace": 0.38}
+  },
+  "keyItemWeights": {
+    "锅の传人": {"Q4": 1.45, "Q2": 1.35, "Q14": 1.25},
+    "单机战神": {"Q9": 1.5, "Q3": 1.35, "Q12": 1.3},
+    "流程护法": {"Q18": 1.55, "Q7": 1.4, "Q19": 1.35},
+    "急急国王": {"Q11": 1.5, "Q20": 1.35, "Q5": 1.25},
+    "扛把子": {"Q15": 1.4, "Q10": 1.35, "Q8": 1.3},
+    "天选牛马": {"Q5": 1.45, "Q17": 1.5, "Q4": 1.25},
+    "饼饼粉碎机": {"Q9": 1.4, "Q1": 1.3, "Q18": 1.35},
+    "群聊气氛组": {"Q13": 1.45, "Q15": 1.4, "Q9": 1.3},
+    "消息黑洞": {"Q15": 1.5, "Q9": 1.45, "Q8": 1.25},
+    "Ctrl+Z 终身成就奖得主": {"Q21": 1.45, "Q14": 1.4, "Q7": 1.35}
+  },
+  "matching": {
+    "primary": "cosine",
+    "normalizeUserVector": "l2",
+    "normalizeCentroids": "l2",
+    "tiebreakEpsilon": 0.02,
+    "tiebreak": "min_hamming_to_patterns"
+  },
+  "notes": [
+    "linearMap 行与 legacy 三维共同决定选项在 5 维上的形状；questionDimensionWeights 控制该题信号进入各维的强度。",
+    "有标注样本后，用 personalityCentroids 的数据驱动版替换本表质心，并收缩融合专家初值。",
+    "keyItemWeights 为乘在单题贡献上的系数（缺省 1.0）；易混人格对可从混淆矩阵反推再填。"
+  ],
+  "handbookV4": {
+    "sourceDoc": "e:/Desktop/CBTI_完整手册.docx",
+    "extractedText": "tools/CBTI_完整手册_extracted.txt",
+    "optionPoints": {"A": 3, "B": 1, "C": 2},
+    "totalScoreRange": [21, 63],
+    "boundaryMarginPoints": 2,
+    "personalities": [
+      {"rank": 1, "name": "消息黑洞", "scoreMin": 21, "scoreMax": 24, "center": 21, "pattern": "BBBBBBBBBBBBBBBBBBBBB"},
+      {"rank": 2, "name": "流程护法", "scoreMin": 25, "scoreMax": 29, "center": 26, "pattern": "BBBBBCBBCBBCBBBBBBBBC"},
+      {"rank": 3, "name": "天选牛马", "scoreMin": 30, "scoreMax": 33, "center": 30, "pattern": "BCCCBBBCBCBCBBBCBBCCB"},
+      {"rank": 4, "name": "单机战神", "scoreMin": 34, "scoreMax": 37, "center": 34, "pattern": "CCCBCBBCCCCBCBCBCCBCB"},
+      {"rank": 5, "name": "群聊气氛组", "scoreMin": 38, "scoreMax": 41, "center": 38, "pattern": "CBCCCBCCCCCCCBCCCCCCB"},
+      {"rank": 6, "name": "饼饼粉碎机", "scoreMin": 42, "scoreMax": 45, "center": 42, "pattern": "CCCCCCCCCCCCCCCCCCCCC"},
+      {"rank": 7, "name": "Ctrl+Z终身成就奖得主", "scoreMin": 46, "scoreMax": 49, "center": 46, "pattern": "ACCCCCCACCCCACCCCACCC"},
+      {"rank": 8, "name": "急急国王", "scoreMin": 50, "scoreMax": 53, "center": 50, "pattern": "AACCCAAAACACCCCCCACCC"},
+      {"rank": 9, "name": "扛把子", "scoreMin": 54, "scoreMax": 57, "center": 54, "pattern": "AAACCAAACAACCCACAAACC"},
+      {"rank": 10, "name": "锅の传人", "scoreMin": 58, "scoreMax": 63, "center": 59, "pattern": "AAAAAAAAAACAAACCACAAA"}
+    ],
+    "questionDimensionWeights": {
+      "Q1": {"drive": 0.4, "relate": 0.1, "structure": 0.1, "boundary": 0.25, "pace": 0.15},
+      "Q2": {"drive": 0.25, "relate": 0.2, "structure": 0.1, "boundary": 0.4, "pace": 0.05},
+      "Q3": {"drive": 0.15, "relate": 0.45, "structure": 0.1, "boundary": 0.3, "pace": 0.0},
+      "Q4": {"drive": 0.25, "relate": 0.35, "structure": 0.15, "boundary": 0.25, "pace": 0.0},
+      "Q5": {"drive": 0.35, "relate": 0.05, "structure": 0.1, "boundary": 0.4, "pace": 0.1},
+      "Q6": {"drive": 0.25, "relate": 0.25, "structure": 0.05, "boundary": 0.35, "pace": 0.1},
+      "Q7": {"drive": 0.2, "relate": 0.1, "structure": 0.45, "boundary": 0.15, "pace": 0.1},
+      "Q8": {"drive": 0.45, "relate": 0.15, "structure": 0.25, "boundary": 0.15, "pace": 0.0},
+      "Q9": {"drive": 0.1, "relate": 0.15, "structure": 0.1, "boundary": 0.45, "pace": 0.2},
+      "Q10": {"drive": 0.15, "relate": 0.4, "structure": 0.05, "boundary": 0.25, "pace": 0.15},
+      "Q11": {"drive": 0.3, "relate": 0.05, "structure": 0.2, "boundary": 0.15, "pace": 0.3},
+      "Q12": {"drive": 0.1, "relate": 0.4, "structure": 0.15, "boundary": 0.35, "pace": 0.0},
+      "Q13": {"drive": 0.05, "relate": 0.5, "structure": 0.0, "boundary": 0.15, "pace": 0.3},
+      "Q14": {"drive": 0.35, "relate": 0.1, "structure": 0.4, "boundary": 0.15, "pace": 0.0},
+      "Q15": {"drive": 0.05, "relate": 0.55, "structure": 0.15, "boundary": 0.15, "pace": 0.1},
+      "Q16": {"drive": 0.35, "relate": 0.2, "structure": 0.2, "boundary": 0.25, "pace": 0.0},
+      "Q17": {"drive": 0.35, "relate": 0.05, "structure": 0.25, "boundary": 0.3, "pace": 0.05},
+      "Q18": {"drive": 0.2, "relate": 0.15, "structure": 0.1, "boundary": 0.45, "pace": 0.1},
+      "Q19": {"drive": 0.1, "relate": 0.15, "structure": 0.4, "boundary": 0.25, "pace": 0.1},
+      "Q20": {"drive": 0.3, "relate": 0.05, "structure": 0.1, "boundary": 0.3, "pace": 0.25},
+      "Q21": {"drive": 0.15, "relate": 0.1, "structure": 0.4, "boundary": 0.2, "pace": 0.15}
+    },
+    "notes": [
+      "人格名称与前端展示需统一是否含「Ctrl+Z」空格及「锅の传人」等写法。",
+      "手册 Ctrl+Z 人格在手册表格写为「Ctrl+Z终身成就奖得主」，与仓库「Ctrl+Z 终身成就奖得主」可能不一致，上线前统一字符串。",
+      "当前仓库 quiz-data.json 题面可能与手册不同；本块仅在手册题库落地后用于生产计分。"
+    ]
+  }
+}

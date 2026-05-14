@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理员登录 - CBTI管理后台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: linear-gradient(160deg, #2b2b2b 0%, #1a1a2e 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-box {
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 20px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.login-box h1 {
+  font-size: 22px;
+  color: #1a3a5c;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.login-box .sub {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.form-group input:focus {
+  border-color: #1a3a5c;
+}
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background: #1a3a5c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-login:hover { background: #2a5a8c; }
+.error {
+  background: #fff0f0;
+  color: #d32f2f;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: #999;
+  font-size: 13px;
+  text-decoration: none;
+}
+.back-link:hover { color: #666; }
+</style>
+</head>
+<body>
+<div class="login-box">
+  <h1>CBTI 管理后台</h1>
+  <div class="sub">请输入管理员密码查看所有测评数据</div>
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post">
+    <div class="form-group">
+      <label>管理员密码</label>
+      <input type="password" name="password" placeholder="请输入密码" autofocus>
+    </div>
+    <button type="submit" class="btn-login">登录后台</button>
+  </form>
+  <a href="/" class="back-link">返回问卷页面</a>
+</div>
+<!-- Railway 冷启动保护 -->
+<script>(function(){function k(){fetch('/health',{method:'GET',cache:'no-store'}).catch(function(){})}k();setInterval(k,4*60*1000)})();</script>
+</body>
+</html>
